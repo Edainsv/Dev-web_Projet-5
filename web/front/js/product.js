@@ -10,9 +10,6 @@ window.onload = function() {
 		'desc': document.getElementById('description'),
 		'colors': document.getElementById('colors')
 	};
-
-
-	// console.log(product);
 	
 	// Requête vers l'API suivante :
 	fetch("http://localhost:3000/api/products/" + _id).then(function(result) {
@@ -20,7 +17,6 @@ window.onload = function() {
 	})
 
 	.then(function(value) {
-		console.log(value.colors);
 		product.img.innerHTML = `<img src="` + value.imageUrl + `" alt="` + value.altTxt + `">`;
 		product.title.innerHTML = value.name;
 		product.price.innerHTML = value.price;
