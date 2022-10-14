@@ -1,4 +1,5 @@
 window.onload = function() {
+	var erreur_message = document.getElementById('erreur');
 	var _id = new URLSearchParams(window.location.search).get('id'); // Récupère la valeur de "id" dans l'URL
 	var element = document.getElementById('product');
 	var btn_addToCart = document.getElementById('addToCart');
@@ -24,7 +25,7 @@ window.onload = function() {
 		product.price.innerHTML = value.price;
 		product.desc.innerHTML = value.description;
 
-		// Boucle sur le nombre de couleurs existantes
+		// Affiche les couleurs existantes
 		for (let i = 0; i < value.colors.length; i++) {
 			let tmp = []; 
 
@@ -39,19 +40,24 @@ window.onload = function() {
 		btn_addToCart.addEventListener('click', function() {
 			// Récupère et stock les données de l'article en cours dans l'objet "datas"
 			let datas = {
+				id : _id,
 			    name : product.title.innerHTML,
 			    price : parseInt(product.price.innerHTML),
 			    color: product.colors.value,
 			    quantity : parseInt(product.quantity.value)
 			}
 
-			// Vérifie l'entrée des éléments
-			if ()
-
-			datas = JSON.stringify(datas);
-			// localStorage.setItem(_id, datas);
-
-			console.log(localStorage.length)
+			// Vérifie que la quantité est un nombre entier valide et qu'une couleur a bien été selectionnée
+			if (datas.quantity >= 1 && datas.quantity <= 100 && Number.isInteger(datas.quantity) && datas.color) {
+				// Si ok on ajoute au local storage
+				tmp_id = datas.color;
+				datas = JSON.stringify(datas);
+				localStorage.setItem(_id + tmp_id, datas);
+				erreur_message.innerHTML = '';
+				location.reload();
+			} else {
+				erreur_message.innerHTML = 'Veuillez bien remplir les champs !';
+			}
 		});			
 	})
 

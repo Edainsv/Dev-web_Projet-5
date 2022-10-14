@@ -4,6 +4,7 @@
 
 main {
 	padding-bottom: 90px;
+	box-sizing: border-box;
 }
 h1 {
 	margin-bottom: 90px;
