@@ -10,6 +10,13 @@ window.onload = function() {
 		'totalPrice' : 0,
 		'totalQuantity' : 0
 	};
+
+	// Si aucun article dans le panier.
+	if (ls.length == 0) {
+		items.innerHTML = `
+			<p class="text-center">Pas d'article dans le panier</p>
+		`;
+	}
 	
 	// Requête vers l'API suivante :
 	fetch("http://localhost:3000/api/products/").then(function(result) {
@@ -64,7 +71,7 @@ window.onload = function() {
 
 
 // Update les changements
-function updateData(id, value) {
+function updateData(id, value, panier) {
 	let key = localStorage.key(id);
 	let tmp = localStorage.getItem(key);
 	var datas = JSON.parse(tmp);
@@ -72,6 +79,9 @@ function updateData(id, value) {
 	datas.quantity = parseInt(value);
 	datas = JSON.stringify(datas);
 	localStorage.setItem(key, datas);
+}
+
+function panierInfo(panier) {
 }
 
 function deleteItem(elm) {
