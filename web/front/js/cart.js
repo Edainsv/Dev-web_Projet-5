@@ -101,7 +101,7 @@ function getImage(id, value) {
 	}
 }
 
-// Arrondie 2 chiffres après la virgule si nécessaire
+// Arrondie 2 chiffres après la virgule
 function deuxApresVirgule(float) {
 	parseFloat(float)
 	return Math.round(float * 100) / 100;

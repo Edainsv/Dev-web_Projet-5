@@ -1,59 +1,110 @@
 var input = {
-'firstName': document.getElementById('firstName'),
-'lastName': document.getElementById('lastName'),
-'address': document.getElementById('address'),
-'city': document.getElementById('city'),
-'email': document.getElementById('email')
+	'firstName': document.getElementById('firstName'),
+	'lastName': document.getElementById('lastName'),
+	'address': document.getElementById('address'),
+	'city': document.getElementById('city'),
+	'email': document.getElementById('email')
 };
 
-// Gérer la saisie utilisateur (formulaire)
-var submit_order = document.getElementById('order');
+var is_ok = {
+	'firstName' : false,
+	'lastName' : false,
+	'address' : false,
+	'city' : false,
+	'email' : false
+};
 
+var submit_order = document.getElementById('order');
 submit_order.addEventListener('click', function(e){
 	e.preventDefault(); // Ne rafraîchi pas la page !
 
 	for (item in input) {
-		if (!input[item].value == '') {
-			erreurMessage(item);
-
-			if (verifyAllField(item, input[item].value)) {
-				console.log('VALIDE');
-			} else {
-
-			}
+		// Teste du remplissage
+		if (input[item].value == '') {
+			erreurMessage('fill', item);
 		} else {
-			erreurMessage(item, 'field');
+			var ok = false;
+			erreurMessage(0, item);
+
+			// On teste la validité des champs saisis
+			ok = tryForRegex(item, input[item].value); // Pour tester tout les champs
+
+			if (!ok) {
+				erreurMessage('regex', item)
+				return;
+			} else {
+				erreurMessage(0, item);
+				is_ok[item] = true;
+
+				if (is_ok.firstName && is_ok.lastName && is_ok.address && is_ok.city && is_ok.email) {
+					order = getRandomInt();
+
+					document.getElementsByClassName('cart__order__form')[0].innerHTML = `
+						<div class="order">
+							<p>Votre demande a bien été prise en compte</p>
+							<p>Voici votre numéro de commande : <strong>${order}</strong></p>
+						</div>
+					`;
+					return;
+				}
+			}
 		}
 	}
 });
 
-// Field, "facultatif" : pour définir manuellement le champ à tester
-function erreurMessage(item, errorType, onlyTextField) {
-	var elm = document.getElementById(item+'ErrorMsg');
+function getRandomInt() {
+  return Math.floor(Math.random(10000000000000) * 99999999999999);
+}
 
-	switch (errorType) {
-		case 'field': // Champ vide
-			return elm.innerHTML = 'Veuillez remplir le champ ' + fieldName(item);
+function tryForRegex(item, value) {
+	switch (item) {
+		case 'firstName':
+			return validateOnlyLetter(value);
+		break;
+		
+		case 'lastName':
+			return validateOnlyLetter(value);
+		break;
+		
+		case 'address':
+			return validateText(value);
+		break;
 
-		case 'regex': // Champ nom conforme
-			if (onlyTextField) {
-				elm.innerHTML = 'Veuillez saisir un ' + fieldName(onlyTextField) + ' valide';
-			} else {
-				elm.innerHTML = 'Veuillez saisir un ' + fieldName(item) + ' valide';
-			}
+		case 'city':
+			return validateText(value);
+		break;
 
-		default:
-			return elm.innerHTML = '';
+		case 'email':
+			return validateEmail(value);
+		break;
 	}
 }
 
+// Affiche l'erreur en cours
+function erreurMessage(errorType, item) {
+	var elm = document.getElementById(item+'ErrorMsg');
+
+	switch (errorType) {
+		case 'fill': // Champ saisi
+			elm.innerHTML = 'Le champ ' + fieldName(item) + ' est obligatoire';
+			break;
+
+		case 'regex':
+			elm.innerHTML = 'Le champ '  + fieldName(item) + ' n\'est pas valide';
+			break;
+
+		default:
+			elm.innerHTML = '';
+			return;
+	}	
+}
+
 // Format texte (lettres uniquement : nom, prénom, etc..)
-function validateOnlyLetter(field) {
-	var regex = new RegExp(/^[a-zA-Z\-]+$/);
-    var valid = regex.test(field);
+function validateOnlyLetter(item) {
+	var regex = new RegExp(/^[a-zA-Z\-îï]{3,}$/);
+    var valid = regex.test(item);
 
     if(!valid) {
-    	erreurMessage();
         return false;
     } else {
         return true;
@@ -61,12 +112,11 @@ function validateOnlyLetter(field) {
 }
 
 // Format adresse
-function validateAddress(address) {
+function validateText(address) {
 	var regex = RegExp(/^[a-zA-Z0-9\s,.'-]{3,}$/);
-	var valid = regex.text(address);
+	var valid = regex.test(address);
 
 	if(!valid) {
-    	erreurMessage('address', 'regex');
         return false;
     } else {
         return true;
@@ -79,7 +129,6 @@ function validateEmail(email){
     var valid = regex.test(email);
 
     if(!valid) {
-    	erreurMessage('email', 'regex');
         return false;
     } else {
         return true;
