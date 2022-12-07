@@ -79,9 +79,7 @@ function updateData(id, value, panier) {
 	datas.quantity = parseInt(value);
 	datas = JSON.stringify(datas);
 	localStorage.setItem(key, datas);
-}
-
-function panierInfo(panier) {
+	location.reload();
 }
 
 function deleteItem(elm) {

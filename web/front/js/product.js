@@ -65,6 +65,4 @@ window.onload = function() {
 		console.error(e);
 		items.innerHTML = '<p><strong>Impossible de charger le produit<strong></p>';
 	});
-
-
 }

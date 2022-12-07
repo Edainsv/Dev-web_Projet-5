@@ -36,7 +36,11 @@ submit_order.addEventListener('click', function(e){
 				erreurMessage(0, item);
 				is_ok[item] = true;
 
+				// Si tout est OK, on peut POST pour récupérer un numéro de commande
 				if (is_ok.firstName && is_ok.lastName && is_ok.address && is_ok.city && is_ok.email) {
+					postForm();
+					return;
+
 					order = getRandomInt();
 
 					document.getElementsByClassName('cart__order__form')[0].innerHTML = `
@@ -150,4 +154,54 @@ function fieldName(item) {
 		default:
 			return;
 	}
+}
+
+
+
+// Pour valider la commande
+function postForm() {
+    let products = [];
+    var tmp = [];
+    let result = [];
+    let ls = localStorage;
+			
+    for (let i = 0; i < ls.length;i++) {
+
+        tmp[i] = localStorage.key(i); // Récupère le nom de la clé
+		tmp[i] = localStorage.getItem(tmp[i]); // Récupère la valeur de la clé
+
+		result[i] = JSON.parse(tmp[i]); // Convertie les données du panier en JSON
+
+		products.push(result[i].id);
+    }
+
+    // On récupère les identifiants des produits et on les stocks dans products.
+    const contact = {
+        firstName : document.getElementById('firstName').value,
+        lastName : document.getElementById('lastName').value,
+        address : document.getElementById('address').value,
+        city : document.getElementById('city').value,
+        email : document.getElementById('email').value
+    }
+
+    console.log(contact);
+    const sendFormData = {
+      contact,
+      products,
+    }
+  
+    const options = {
+		method: 'POST',
+		body: JSON.stringify(sendFormData),
+		headers: { 
+			'Content-Type': 'application/json',
+		}
+    };
+  
+  	// Requête POST vers l'API
+    fetch("http://localhost:3000/api/products/order", options).then(response => response.json()).then(data => {
+        localStorage.setItem('orderId', data.orderId);
+        document.location.href = 'confirmation.html?id='+ data.orderId;
+	});
+
 }
