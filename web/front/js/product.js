@@ -3,6 +3,9 @@ window.onload = function() {
 	var _id = new URLSearchParams(window.location.search).get('id'); // Récupère la valeur de "id" dans l'URL
 	var element = document.getElementById('product');
 	var btn_addToCart = document.getElementById('addToCart');
+	var ls = localStorage;
+	var tmp = [], result = [];
+	var need_update = false;
 
 	// Récupérer et stocke les éléments du DOM nécessaires
 	var product = {
@@ -27,7 +30,7 @@ window.onload = function() {
 
 		// Affiche les couleurs existantes
 		for (let i = 0; i < value.colors.length; i++) {
-			let tmp = []; 
+			let tmp = [];
 
 			tmp[i] = document.createElement('option');
 			tmp[i].value = value.colors[i];
@@ -39,30 +42,60 @@ window.onload = function() {
 		// Event pour ajouter au panier
 		btn_addToCart.addEventListener('click', function() {
 			// Récupère et stock les données de l'article en cours dans l'objet "datas"
-			let datas = {
+			let data_form = {
 				id : _id,
 			    name : product.title.innerHTML,
-			    price : parseInt(product.price.innerHTML),
 			    color: product.colors.value,
 			    quantity : parseInt(product.quantity.value)
 			}
 
 			// Vérifie que la quantité est un nombre entier valide et qu'une couleur a bien été selectionnée
-			if (datas.quantity >= 1 && datas.quantity <= 100 && Number.isInteger(datas.quantity) && datas.color) {
-				// Si ok on ajoute au local storage
-				tmp_id = datas.color;
-				datas = JSON.stringify(datas);
-				localStorage.setItem(_id + tmp_id, datas);
+			if (data_form.quantity >= 1 && data_form.quantity <= 100 && Number.isInteger(data_form.quantity) && data_form.color) {
+				var ls_id = value._id + data_form.color;
+				var ls = localStorage;
+				data_form = JSON.stringify(data_form);
+
+				if (!keyExiste(ls_id)) {
+					ls.setItem(ls_id, data_form);
+
+					// console.log("Clé créée !")
+				} else {
+					data_form = JSON.parse(data_form)
+					updateData(ls_id, data_form);
+					// console.log("Modification effectuée");
+				}
+
 				erreur_message.innerHTML = '';
 				location.reload();
 			} else {
 				erreur_message.innerHTML = 'Veuillez bien remplir les champs !';
 			}
-		});			
+		});	
 	})
 
 	.catch(function(e) {
 		console.error(e);
 		items.innerHTML = '<p><strong>Impossible de charger le produit<strong></p>';
 	});
+}
+
+function keyExiste(ls_id) {
+	if (localStorage.getItem(ls_id)) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+function updateData(id, value) {
+	var ls = localStorage.getItem(id);
+	var ls_data = JSON.parse(ls);
+	var result = 0;
+
+	result += ls_data.quantity + value.quantity;
+
+	ls_data.quantity = parseInt(result);
+
+	send_data = JSON.stringify(ls_data);
+	localStorage.setItem(id, send_data);
 }

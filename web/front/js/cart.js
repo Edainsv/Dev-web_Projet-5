@@ -3,7 +3,6 @@ window.onload = function() {
 	var ls = localStorage; // Récupère le nombre d'article dans le panier
 	var articles = new Array();
 	var tmp = [];
-	var tmp_price = [];
 	var tmp_url = [];
 	var result = [];
 	var panier = {
@@ -22,24 +21,29 @@ window.onload = function() {
 	fetch("http://localhost:3000/api/products/").then(function(result) {
 		return result.json();
 	}).then(function(value) {
+		var tmp_quantity = [];
+		var tmp_price = [];
+		var tmp_id = [];
+
 		for (let i = 0; i < ls.length; i++) {
 			tmp[i] = localStorage.key(i); // Récupère le nom de la clé
 			tmp[i] = localStorage.getItem(tmp[i]); // Récupère la valeur de la clé
 
 			result[i] = JSON.parse(tmp[i]); // Convertie les données du panier en JSON
 
+			// Création de l'élément
 			articles[i] = document.createElement('article');
 			articles[i].classList.add('cart__item');
 			articles[i].innerHTML = `
 				<div class="cart__item__img">
-					<img src="${getImage(result[i].id, value)}" alt="Photographie d'un canapé">
+					<img src="${ getImage(result[i].id, value) }" alt="Photographie d'un canapé">
 				</div>
 
 				<div class="cart__item__content">
 					<div class="cart__item__content__description">
 						<h2>${result[i].name}</h2>
 						<p>${result[i].color}</p>
-						<p>${result[i].price} €</p>
+						<p>${ getPrice(result[i].id, value) } €</p>
 					</div>
 
 					<div class="cart__item__content__settings">
@@ -56,22 +60,21 @@ window.onload = function() {
 			`;
 			items.appendChild(articles[i]);
 
-			tmp_price[i] = result[i].price * result[i].quantity
+			tmp_price[i] = getPrice(result[i].id, value) * result[i].quantity
 			panier.totalQuantity += result[i].quantity // Quantité
 		}
 
 		for (let i = 0; i < tmp_price.length; i++) {
-			panier.totalPrice += tmp_price[i];
+			panier.totalPrice +=  tmp_price[i];
 		}
 
 		document.getElementById('totalQuantity').innerHTML = panier.totalQuantity;
 		document.getElementById('totalPrice').innerHTML = deuxApresVirgule(panier.totalPrice);
-	})
+	});
 }
 
-
 // Update les changements
-function updateData(id, value, panier) {
+function updateData(id, value) {
 	let key = localStorage.key(id);
 	let tmp = localStorage.getItem(key);
 	var datas = JSON.parse(tmp);
@@ -90,11 +93,17 @@ function deleteItem(elm) {
 
 // Retourne la bonne image à afficher
 function getImage(id, value) {
-	var index;
-
 	for (let i = 0; i < value.length; i++) {
 		if (value[i]._id == id) {
 			return value[i].imageUrl;
+		}
+	}
+}
+
+function getPrice(id, value) {
+	for (let i = 0; i < value.length; i++) {
+		if (value[i]._id == id) {
+			return value[i].price;
 		}
 	}
 }
